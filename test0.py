@@ -29,7 +29,15 @@ import serial
 hex_string = '55 55 00 00 AA'
 ser_message = bytes.fromhex(hex_string)
 
-ser = serial.Serial(port='COM4', baudrate=9600, timeout = 0.1)
+ser = serial.Serial(
+    port='COM4', 
+    baudrate=9600, 
+    bytesize=EIGHTBITS,
+    parity=PARITY_NONE,
+    stopbits=STOPBITS_ONE,
+    timeout = 0)
+    
+ser.close()    
 ser.open()
 ser.flushInput()
 while True:
