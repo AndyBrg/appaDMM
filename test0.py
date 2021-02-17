@@ -43,7 +43,7 @@ ser.flushInput()
 while True:
     try:
         ser.write(ser_message)
-        ser_message_read = ser.readline()
+        ser_message_read = ser.readline().hex
         time.sleep(0.5)
 
         print(ser_message_read)
