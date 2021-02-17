@@ -43,10 +43,10 @@ ser.flushInput()
 while True:
     try:
         ser.write(ser_message)
-        ser_message_read = ser.readline().hex
+        ser_message_read = ser.readline()
         time.sleep(0.5)
 
-        print(ser_message_read)
+        print(ser_message_read.hex())
     except:
         print("Interrupt")
         break
