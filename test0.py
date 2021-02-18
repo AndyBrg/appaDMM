@@ -39,9 +39,9 @@ def send_port():
     threading.Timer(0.5, send_port).start()
     ser.write(ser_message)
     ser_message_read = ser.readline()
-    # if len(ser_message_read) == 0:
-    #     ser_message_read = 0
-    print(ser_message_read.hex())
+
+    print(ser_message_read)
+    # print(ser_message_read.hex())
 
 
 hex_string = '55 55 00 00 AA'
@@ -57,15 +57,12 @@ ser = serial.Serial(
 ser.close()  
 
 ser.open()
-ser.write(ser_message)
-ser_message_read = ser.readline()
-print(ser_message_read.hex())
-
-while True:
-    try:
-        
-        send_port()
-
-    except:
-        print("Interrupt")
-        break
+if ser.is_open:
+    while True:
+        try:
+            send_port()
+        except Exception as exc:
+            print('type: {0}, message: {1}'.format(type(exc), str(exc)))
+            break
+    else:
+        ser.close()
