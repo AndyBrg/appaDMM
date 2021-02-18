@@ -26,6 +26,22 @@
 
 import time
 import serial
+import threading
+
+
+# 5555000e02000001e31f001201f40100790240
+# 5555000e020000013c1f001201f30100790298
+# 5555000e02000001041f001201f40100790261
+# 5555000e02000001b020001201f4010079020e
+# 5555000e020000012521001201f40100790284
+
+def send_port():
+    threading.Timer(0.5, send_port).start()
+    ser.write(ser_message)
+    ser_message_read = ser.readline()
+    # if len(ser_message_read) == 0:
+    #     ser_message_read = 0
+    print(ser_message_read.hex())
 
 
 hex_string = '55 55 00 00 AA'
@@ -48,21 +64,8 @@ print(ser_message_read.hex())
 while True:
     try:
         
-        ser.write(ser_message)
-        ser_message_read = ser.readline()
-        # if len(ser_message_read) == 0:
-        #     ser_message_read = 0
+        send_port()
 
-        # 5555000e02000001e31f001201f40100790240
-        # 5555000e020000013c1f001201f30100790298
-        # 5555000e02000001041f001201f40100790261
-        # 5555000e02000001b020001201f4010079020e
-        # 5555000e020000012521001201f40100790284
-
-        
-
-        print(ser_message_read.hex())
-        time.sleep(0.5)
     except:
         print("Interrupt")
         break
