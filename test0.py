@@ -28,6 +28,7 @@ import time
 import serial
 import threading
 
+from check_crc import check_crc
 
 # 5555000e02000001e31f001201f40100790240
 # 5555000e020000013c1f001201f30100790298
@@ -40,11 +41,18 @@ import threading
 def send_port():
     # threading.Timer(0.5, send_port).start()
     ser.write(ser_message)
-    ser_message_read = ser.readline()
-   
-    print(ser_message_read, len(ser_message_read))
-    # print(ser_message_read.hex())
     time.sleep(0.5)
+    ser_message_read = ser.readline()
+    if check_crc(ser_message_read, 19):
+        crc = "OK"
+    else:
+        crc ="ERR"
+
+    
+
+    print(ser_message_read.hex(), crc)
+    # print(ser_message_read.hex())
+    
 
 
 hex_string = '55 55 00 00 AA'
