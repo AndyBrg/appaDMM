@@ -1,8 +1,11 @@
-from datetime import datetime
-
-
-time_tmp = datetime.isoformat(datetime.now(), sep=' ', timespec='milliseconds')
+tmp = b'UU\x00\x0e\x01\x00\x00\x00\x19\x04\x00\x0c\x01\x00\x00\x00y\x02^'
 
     
 
-print(time_tmp)
+print(tmp.hex())
+print(len(tmp))
+print()
+
+# tmp = bytearray(tmp)
+for x in range(len(tmp)):
+    print(tmp[x])
