@@ -74,40 +74,60 @@ class RepeatedTimer(object):
 poll_time = 0.5
 
 
-index = 0
 
+
+index = 0
 global time_receive
 global data_receive
 
 def send_port():
+    global index
     # threading.Timer(poll_time, send_port).start()
     ser.write(data_send)
-    time.sleep(0.5)
+    # if index == 0:
+    #     time.sleep(0.5)
+
     data_receive = ser.readline()
     time_receive = datetime.isoformat(
         datetime.now(), sep=' ', timespec='milliseconds')    
+
     if check_crc(data_receive):
         crc = "OK"
-        global index
+        
         index += 1
     else:
         crc ="ER"
 
     print(index, time_receive, crc, data_receive.hex())
 
+def read_port():
+    global index
+   
+    data_receive = ser.readline()
+    time_receive = datetime.isoformat(
+        datetime.now(), sep=' ', timespec='milliseconds')    
 
+    if check_crc(data_receive):
+        crc = "OK"
+        
+        index += 1
+    else:
+        crc ="ER"
+
+    print(index, time_receive, crc, data_receive.hex())
+    ser.write(data_send)
 
 
 appa_109n = "55 55 00 00 AA"
 data_send = bytes.fromhex(appa_109n)
 
 ser = serial.Serial(
-    port="COM3", 
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS,
-    xonxoff=False,
-    timeout=0)
+    port     = "COM3", 
+    parity   = serial.PARITY_NONE,
+    stopbits = serial.STOPBITS_ONE,
+    bytesize = serial.EIGHTBITS,
+    xonxoff  = False,
+    timeout  = 0)
     
 ser.close()  
 
@@ -121,12 +141,18 @@ ser.open()
 #         print("type: {0}, message: {1}".format(type(exc), str(exc)))
 #         break
 
+
+# if ser.is_open:
+#     send_port()        
+
 if ser.is_open:
-    send_port()
-    rt = RepeatedTimer(poll_time, send_port)
+
+    ser.write(data_send)   
+    time.sleep(0.5)         
+    rt = RepeatedTimer(poll_time, read_port)
 
 
 try:
-    time.sleep(10) # your long-running job goes here...
+    time.sleep(5) # your long-running job goes here...
 finally:
     rt.stop() # better in a try/finally block to make sure the program ends!
