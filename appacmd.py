@@ -69,14 +69,12 @@ class RepeatedTimer(object):
         self._timer.cancel()
         self.is_running = False
 
-# rt = RepeatedTimer(1, hello, "World")
 
 poll_time = 0.5
 
 
-
-
 index = 0
+
 global time_receive
 global data_receive
 
@@ -102,7 +100,10 @@ def send_port():
 
 def read_port():
     global index
-   
+
+    if index == 0:
+        ser.write(data_send)
+        time.sleep(0.5)
     data_receive = ser.readline()
     time_receive = datetime.isoformat(
         datetime.now(), sep=' ', timespec='milliseconds')    
@@ -142,13 +143,8 @@ ser.open()
 #         break
 
 
-# if ser.is_open:
-#     send_port()        
-
 if ser.is_open:
-
-    ser.write(data_send)   
-    time.sleep(0.5)         
+    read_port() 
     rt = RepeatedTimer(poll_time, read_port)
 
 
