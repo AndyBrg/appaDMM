@@ -233,7 +233,7 @@ functiontable = {
     b"\x0E": "Min",
     b"\x10": "Peak Hold Max",
     b"\x11": "Peak Hold Min",
-    b"\x17": "",
+    b"\x17": "\u0394",
     b"\x19": "Ref",
     b"\x1A": "dBm",
     b"\x1B": "dB",
