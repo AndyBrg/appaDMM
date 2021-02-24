@@ -26,8 +26,9 @@
 
 import time
 import serial
+import 
+# from ctypes import *
 
-from ctypes import c_int
 from threading import Timer
 from datetime import datetime
 from check_crc import check_crc
@@ -39,10 +40,26 @@ from check_crc import check_crc
 # Not connected...
 # Please connect the device
 
-# class pxtup(Structure):
-#     _fields_ = [('red', c_int),
-#                 ('green', c_int),
-#                 ('blue', c_int)]
+# class data_read(Structure):
+#     _fields_ = [("appa_mod0", c_ubyte),
+#                 ("appa_mod1", c_ubyte),
+#                 ("appa_mod2", c_ubyte),
+#                 ("appa_mod3", c_ubyte),
+#                 ("rotor_code", c_ubyte),
+#                 ("blue_code", c_ubyte),
+#                 ("key_code", c_ubyte),
+#                 ("range_code", c_ubyte),
+#                 ("main_read0", c_ubyte),
+#                 ("main_read1", c_ubyte),
+#                 ("main_read2", c_ubyte),
+#                 ("main_read3", c_ubyte),
+#                 ("main_read4", c_ubyte),
+#                 ("sub_read0", c_ubyte),
+#                 ("sub_read1", c_ubyte),
+#                 ("sub_read2", c_ubyte),
+#                 ("sub_read3", c_ubyte),
+#                 ("sub_read4", c_ubyte),
+#                 ("check_sum", c_ubyte)]
 
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
@@ -73,38 +90,21 @@ class RepeatedTimer(object):
 poll_time = 0.5
 
 
-index = 0
+number_rp = 0
 
 global time_receive
 global data_receive
 
+
+
 def send_port():
-    global index
-    # threading.Timer(poll_time, send_port).start()
-    ser.write(data_send)
-    # if index == 0:
-    #     time.sleep(0.5)
+    global get_counts
 
-    data_receive = ser.readline()
-    time_receive = datetime.isoformat(
-        datetime.now(), sep=' ', timespec='milliseconds')    
-
-    if check_crc(data_receive):
-        crc = "OK"
-        
-        index += 1
-    else:
-        crc ="ER"
-
-    print(index, time_receive, crc, data_receive.hex())
-
-def read_port():
-    global index
-
-    if index == 0:
+    if get_counts == 0:
         ser.write(data_send)
         time.sleep(0.5)
     data_receive = ser.readline()
+   
     time_receive = datetime.isoformat(
         datetime.now(), sep=' ', timespec='milliseconds')    
 
@@ -115,7 +115,8 @@ def read_port():
     else:
         crc ="ER"
 
-    print(index, time_receive, crc, data_receive.hex())
+    
+    print(get_counts, time_receive, crc, data_receive)
     ser.write(data_send)
 
 
@@ -133,6 +134,7 @@ ser = serial.Serial(
 ser.close()  
 
 ser.open()
+ser.flush()
 
 # while True:
 #     try:
@@ -144,8 +146,8 @@ ser.open()
 
 
 if ser.is_open:
-    read_port() 
-    rt = RepeatedTimer(poll_time, read_port)
+    send_port() 
+    rt = RepeatedTimer(poll_time, send_port)
 
 
 try:
