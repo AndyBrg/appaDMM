@@ -1,27 +1,9 @@
 
 from check_crc import int_to_bytes
 
-tmp = b'UU\x00\x0e\x01\x00\x00\x00\x19\x04\x00\x0c\x01\x00\x00\x00y\x02^'
-
-# 0  ("appa_mod0", c_ubyte),
-# 1  ("appa_mod1", c_ubyte),
-# 2  ("appa_mod2", c_ubyte),
-# 3  ("appa_mod3", c_ubyte),
-# 4  ("rotor_code", c_ubyte),
-# 5  ("blue_code", c_ubyte),
-# 6  ("key_code", c_ubyte),
-# 7  ("range_code", c_ubyte),
-# 8  ("main_read0", c_ubyte),
-# 9  ("main_read1", c_ubyte),
-# 10 ("main_read2", c_ubyte),
-# 11 ("main_read3", c_ubyte),
-# 12 ("main_read4", c_ubyte),
-# 13 ("sub_read0", c_ubyte),
-# 14 ("sub_read1", c_ubyte),
-# 15 ("sub_read2", c_ubyte),
-# 16 ("sub_read3", c_ubyte),
-# 17 ("sub_read4", c_ubyte),
-# 18 ("check_sum", c_ubyte)
+# tmp = b'UU\x00\x0e\x03\x00\x00\x00\t0\x00R\x01\x00\x00\x00\x00\x00G'
+# tmp = b'UU\x00\x0e\x04\x00\x00\x80I\x00\x00\x0b\x01\x00\x00\x00\x00\x00\x91'
+tmp = b'UU\x00\x0e\x01\x01\x00\x01{\x0c\x00\x0b\x01\x00\x00\x00\x00\x00N'
 
 rotorcode = {
     b"\x00": "OFF",
@@ -281,9 +263,8 @@ print(range_code)
 
 main_read = int_to_bytes(tmp[8]) + int_to_bytes(tmp[9]) + int_to_bytes(tmp[10])
 print("MAIN", main_read.hex())
-main_read_b = int.from_bytes(main_read, byteorder = "big")
-main_read_l = int.from_bytes(main_read, byteorder = "little")
-print("Main value=", main_read_b, main_read_l)
+main_read = int.from_bytes(main_read, byteorder = "little")
+print("Main value=", main_read)
 
 main_status_bits = bin(tmp[11])[2:].zfill(8)
 
