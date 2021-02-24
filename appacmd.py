@@ -26,7 +26,7 @@
 
 import time
 import serial
-import 
+
 # from ctypes import *
 
 from threading import Timer
@@ -90,7 +90,7 @@ class RepeatedTimer(object):
 poll_time = 0.5
 
 
-number_rp = 0
+get_counts = 0
 
 global time_receive
 global data_receive
@@ -111,12 +111,12 @@ def send_port():
     if check_crc(data_receive):
         crc = "OK"
         
-        index += 1
+        get_counts += 1
     else:
         crc ="ER"
 
     
-    print(get_counts, time_receive, crc, data_receive)
+    print(get_counts, time_receive, crc, data_receive, data_receive.hex())
     ser.write(data_send)
 
 
