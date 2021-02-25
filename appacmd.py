@@ -31,8 +31,9 @@ import serial
 
 from threading import Timer
 from datetime import datetime
-from check_crc import check_crc
 
+from check_crc import *
+from appa_109n import *
 
 # 5555000e02000001e31f001201f40100790240
 # b'UU\x00\x0e\x01\x00\x00\x00\x19\x04\x00\x0c\x01\x00\x00\x00y\x02^' 19
@@ -108,15 +109,45 @@ def send_port():
     time_receive = datetime.isoformat(
         datetime.now(), sep=' ', timespec='milliseconds')    
 
-    if check_crc(data_receive):
-        crc = "OK"
-        
-        get_counts += 1
-    else:
-        crc ="ER"
+    appa_type = data_receive[0:4] # Получаем тип мультиметра
+    if appa_type.hex() == "5555000e": # Для APPA 109N
+            
+        if check_crc(data_receive):
+            crc = "OK"
+            get_counts += 1
+
+            main_rotor_code = rotorcode(int_to_bytes(data_receive[4]))
+
+            main_blue_code  = bluecode(int_to_bytes(data_receive[4]) + 
+                                    int_to_bytes(data_receive[5]))
+
+            main_range_code = rangecode(int_to_bytes(data_receive[4]) + 
+                                        int_to_bytes(data_receive[5]) + 
+                                        int_to_bytes(data_receive[7]))  
+
+            main_value = int_to_bytes(data_receive[8]) + 
+                        int_to_bytes(data_receive[9]) + 
+                        int_to_bytes(data_receive[10])
+
+            main_value = int.from_bytes(main_read, byteorder = "little")     
+
+            main_status_bits = bin(data_receive[11])[2:].zfill(8)
+
+            point_code_bits = main_status_bits[5:]    
+
+            main_pointcode = pointcode(point_code_bits)
+
+            main_unit_code_bits = main_status_bits[0:5]
+
+            func_table = functiontable(int_to_bytes(data_receive[12]))
+
+            print(value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))           
+        else:
+            crc ="ER"
 
     
-    print(get_counts, time_receive, crc, data_receive, data_receive.hex())
+    # print(get_counts, time_receive, crc, data_receive, data_receive.hex())
+    print(get_counts, time_receive, main_rotor_code)
     ser.write(data_send)
 
 
