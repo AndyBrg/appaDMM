@@ -1,11 +1,12 @@
-
 from check_crc import int_to_bytes
 
-# tmp = b'UU\x00\x0e\x03\x00\x00\x00\t0\x00R\x01\x00\x00\x00\x00\x00G'
-# tmp = b'UU\x00\x0e\x04\x00\x00\x80I\x00\x00\x0b\x01\x00\x00\x00\x00\x00\x91'
-tmp = b'UU\x00\x0e\x01\x01\x00\x01{\x0c\x00\x0b\x01\x00\x00\x00\x00\x00N'
+#tmp = b'UU\x00\x0e\x03\x00\x00\x00\t0\x00R\x01\x00\x00\x00\x00\x00G'
+tmp = b'UU\x00\x0e\x04\x00\x00\x80I\x00\x00\x0b\x01\x00\x00\x00\x00\x00\x91'
+#tmp = b'UU\x00\x0e\x01\x01\x00\x01{\x0c\x00\x0b\x01\x00\x00\x00\x00\x00N'
 
-rotorcode = {
+
+def rotorcode(x):
+    return {      
     b"\x00": "OFF",
     b"\x01": "V",
     b"\x02": "mV",
@@ -16,9 +17,11 @@ rotorcode = {
     b"\x07": "Cap.",
     b"\x08": "Hz",
     b"\x09": "Temp."
-}
+}[x]
 
-bluecode = {
+
+def bluecode(x):
+    return {    
     b"\x01\x00": "AC",
     b"\x01\x01": "DC",
     b"\x01\x02": "AC+DC",
@@ -46,9 +49,10 @@ bluecode = {
     b"\x09\x00": "deg.C",   
     b"\x09\x01": "deg.F",
     b"\x09\x02": "-------"
-}
+}[x]
 
-rangecode = {
+def rangecode(x):
+    return {
     b"\x01\x00\x00": "2V",      # AC V        Auto
     b"\x01\x00\x01": "20V",     # AC V        Auto
     b"\x01\x00\x02": "200V",    # AC V        Auto
@@ -155,19 +159,21 @@ rangecode = {
     b"\x09\x00\x81": "1200",    # deg.C       Manual
     b"\x09\x01\x80": "400",     # deg.F       Manual
     b"\x09\x01\x81": "2192"     # deg.F       Manual
-}
+}.get(x, "None")
 
 
-pointcode = {
+def pointcode(x):
+    return {
     "000": 0,
     "001": 1,
     "010": 2,
     "011": 3,
     "100": 4
-}
+}[x]
 
 
-unitcode = {
+def unitcode(x):
+    return {    
     "00000": "None",
     "00001": "V",
     "00010": "mV",
@@ -198,10 +204,12 @@ unitcode = {
     "11011": "\u03A9",
     "11100": "K\u03A9",
     "11101": "M\u03A9"
-}
+}[x]
 
 
-functiontable = {
+
+def functiontable(x):
+    return {        
     b"\x00": "None",
     b"\x01": "Input Reading",
     b"\x02": "Freq",
@@ -234,8 +242,26 @@ functiontable = {
     b"\x31": "EPEr",
     b"\x32": "EEPROM",
     b"\x33": "Login Stamp"
-}
+}[x]
 
+
+def value_to_float(value: int, point_code: int) -> float:
+    v = len(str(value))
+    p = point_code
+    if v > p:
+        return float(str(value)[0:len(str(value)) - 
+                                point_code]+"."+str(value)[len(str(value)) -
+                                point_code:len(str(value))])
+    elif v == p:
+        return float("0."+str(value))        
+    else:
+        if v == 2:
+            return float("0.0"+str(value))   
+        elif v == 1:
+            return float("0.00"+str(value))        
+
+
+# -----------------------------------------
 print(tmp.hex(), len(tmp))
 print()
 
@@ -249,39 +275,41 @@ elif appa.hex() == "55550000":
 
 print("Знак градуса \u00B0С")
 
-rotor_code = rotorcode.get(int_to_bytes(tmp[4]))
+rotor_code = rotorcode(int_to_bytes(tmp[4]))
 print(rotor_code)
 
-blue_code = bluecode.get(int_to_bytes(tmp[4]) + 
-                         int_to_bytes(tmp[5]))
+blue_code = bluecode(int_to_bytes(tmp[4]) + 
+                     int_to_bytes(tmp[5]))
 print(blue_code)
 
-range_code = rangecode.get(int_to_bytes(tmp[4]) + 
-                          int_to_bytes(tmp[5]) + 
-                          int_to_bytes(tmp[7]))
+range_code = rangecode(int_to_bytes(tmp[4]) + 
+                       int_to_bytes(tmp[5]) + 
+                       int_to_bytes(tmp[7]))
 print(range_code)
 
 main_read = int_to_bytes(tmp[8]) + int_to_bytes(tmp[9]) + int_to_bytes(tmp[10])
-print("MAIN", main_read.hex())
+# print("MAIN", main_read.hex())
 main_read = int.from_bytes(main_read, byteorder = "little")
 print("Main value=", main_read)
 
 main_status_bits = bin(tmp[11])[2:].zfill(8)
 
 point_code_bits = main_status_bits[5:]
-print(main_status_bits, point_code_bits)
-print("Point code = ", pointcode.get(point_code_bits))
+# print(main_status_bits, point_code_bits)
+main_pointcode = pointcode(point_code_bits)
+print("Point code = ", main_pointcode)
 
-unit_code_bits = main_status_bits[0:5]
-print(main_status_bits, unit_code_bits)
-print("Unit code = ", unitcode.get(unit_code_bits))
 
-func_table = functiontable.get(int_to_bytes(tmp[12]))
-print(func_table)
+main_unit_code_bits = main_status_bits[0:5]
+# print(main_status_bits, unit_code_bits)
+print("Unit code = ", unitcode(main_unit_code_bits))
+
+func_table = functiontable(int_to_bytes(tmp[12]))
+print("Function main = ", func_table)
 
 
 sub_read = int_to_bytes(tmp[13]) + int_to_bytes(tmp[14]) + int_to_bytes(tmp[15])
-print("SUB", sub_read.hex())
+# print("SUB", sub_read.hex())
 sub_read_b = int.from_bytes(sub_read, byteorder = "big")
 sub_read_l = int.from_bytes(sub_read, byteorder = "little")
 print("Sub value=", sub_read_b, sub_read_l)
@@ -289,12 +317,16 @@ print("Sub value=", sub_read_b, sub_read_l)
 sub_status_bits = bin(tmp[16])[2:].zfill(8)
 
 point_code_bits = sub_status_bits[5:]
-print(sub_status_bits, point_code_bits)
-print("Point code = ", pointcode.get(point_code_bits))
+# print(sub_status_bits, point_code_bits)
+sub_pointcode = pointcode(point_code_bits)
+print("Point code = ", sub_pointcode)
 
 unit_code_bits = sub_status_bits[0:5]
-print(sub_status_bits, unit_code_bits)
-print("Unit code = ", unitcode.get(unit_code_bits))
+# print(sub_status_bits, unit_code_bits)
+print("Unit code = ", unitcode(unit_code_bits))
 
-func_table = functiontable.get(int_to_bytes(tmp[17]))
-print(func_table)
+func_table = functiontable(int_to_bytes(tmp[17]))
+print("Function sub = ",func_table)
+
+
+print(value_to_float(main_read, main_pointcode), unitcode(main_unit_code_bits))
