@@ -1,7 +1,7 @@
 from check_crc import int_to_bytes, check_crc
 from appa_109n import *
 
-#tmp = b'UU\x00\x0e\x03\x00\x00\x00\t0\x00R\x01\x00\x00\x00\x00\x00G'
+# tmp = b'UU\x00\x0e\x03\x00\x00\x00\t0\x00R\x01\x00\x00\x00\x00\x00G'
 # tmp = b'UU\x00\x0e\x04\x00\x00\x80I\x00\x00\x0b\x01\x00\x00\x00\x00\x00\x91'
 #tmp = b'UU\x00\x0e\x01\x01\x00\x01{\x0c\x00\x0b\x01\x00\x00\x00\x00\x00N'
 # tmp = b'UU\x00\x0e\x04\x01\x00\x80\xf5\x03\x00Q\x01\x00\x00\x00\x00\x00\x87'
@@ -43,6 +43,7 @@ elif appa.hex() == "55550000":
 
 print("Знак градуса \u00B0С")
 
+print(int_to_bytes(tmp[4]))
 rotor_code = rotorcode(int_to_bytes(tmp[4]))
 print(rotor_code)
 
@@ -55,7 +56,10 @@ range_code = rangecode(int_to_bytes(tmp[4]) +
                        int_to_bytes(tmp[7]))
 print(range_code)
 
-main_read = int_to_bytes(tmp[8]) + int_to_bytes(tmp[9]) + int_to_bytes(tmp[10])
+# main_read = int_to_bytes(tmp[8]) + int_to_bytes(tmp[9]) + int_to_bytes(tmp[10])
+# print(main_read)
+main_read = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
+# print(int_to_bytes(main_read))
 # print("MAIN", main_read.hex())
 main_read = int.from_bytes(main_read, byteorder = "little")
 print("Main value=", main_read)
