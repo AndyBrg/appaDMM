@@ -107,6 +107,12 @@ poll_time = 0.5
 
 get_counts = 0
 
+main_rotor_code =0
+main_blue_code=0
+main_range_code = 0
+main_value_b=0
+main_value = 0
+
 global time_receive
 global data_receive
 
@@ -115,6 +121,9 @@ global data_receive
 def send_port():
     global get_counts
 
+    global main_rotor_code, main_blue_code, main_range_code
+    global main_value_b, main_value
+   
     if get_counts == 0:
         ser.write(data_send)
         time.sleep(0.5)
@@ -123,45 +132,43 @@ def send_port():
     time_receive = datetime.isoformat(
         datetime.now(), sep=' ', timespec='milliseconds')    
 
-    appa_type = data_receive[0:4] # Получаем тип мультиметра
-    if appa_type.hex() == "5555000e": # Для APPA 109N
+    # appa_type = data_receive[0:4] # Получаем тип мультиметра
+    # if appa_type.hex() == "5555000e": # Для APPA 109N
             
-        if check_crc(data_receive):
-            crc = "OK"
-            get_counts += 1
+    if check_crc(data_receive):
+        crc = "OK"
+        get_counts += 1
 
-            main_rotor_code = rotorcode(int_to_bytes(data_receive[4]))
+        main_rotor_code = rotorcode(int_to_bytes(data_receive[4]))
 
-            main_blue_code  = bluecode(int_to_bytes(data_receive[4]) + 
-                                    int_to_bytes(data_receive[5]))
+        main_blue_code  = bluecode(int_to_bytes(data_receive[4]) + 
+                                int_to_bytes(data_receive[5]))
 
-            main_range_code = rangecode(int_to_bytes(data_receive[4]) + 
-                                        int_to_bytes(data_receive[5]) + 
-                                        int_to_bytes(data_receive[7]))  
+        main_range_code = rangecode(int_to_bytes(data_receive[4]) + 
+                                    int_to_bytes(data_receive[5]) + 
+                                    int_to_bytes(data_receive[7]))  
 
-            main_value = int_to_bytes(data_receive[8]) + 
-                        int_to_bytes(data_receive[9]) + 
-                        int_to_bytes(data_receive[10])
+        main_value_b = int_to_bytes(data_receive[8]) + int_to_bytes(data_receive[9]) + int_to_bytes(data_receive[10])
 
-            main_value = int.from_bytes(main_read, byteorder = "little")     
+        main_value = int.from_bytes(main_value_b, byteorder = "little")     
 
-            main_status_bits = bin(data_receive[11])[2:].zfill(8)
+        main_status_bits = bin(data_receive[11])[2:].zfill(8)
 
-            point_code_bits = main_status_bits[5:]    
+        point_code_bits = main_status_bits[5:]    
 
-            main_pointcode = pointcode(point_code_bits)
+        main_pointcode = pointcode(point_code_bits)
 
-            main_unit_code_bits = main_status_bits[0:5]
+        main_unit_code_bits = main_status_bits[0:5]
 
-            func_table = functiontable(int_to_bytes(data_receive[12]))
+        func_table = functiontable(int_to_bytes(data_receive[12]))
 
-            print(value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))           
-        else:
-            crc ="ER"
+            
+    else:
+        crc ="ER"
 
     
-    # print(get_counts, time_receive, crc, data_receive, data_receive.hex())
-    print(get_counts, time_receive, main_rotor_code)
+    print(get_counts, time_receive, crc, data_receive)
+    print(get_counts, time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
     ser.write(data_send)
 
 
