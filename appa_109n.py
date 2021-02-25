@@ -238,18 +238,3 @@ def functiontable(x):
     b"\x33": "Login Stamp"
 }[x]
 
-
-def value_to_float(value: int, point_code: int) -> float:
-    v = len(str(value))
-    p = point_code
-    if v > p:
-        return float(str(value)[0:len(str(value)) - 
-                                point_code]+"."+str(value)[len(str(value)) -
-                                point_code:len(str(value))])
-    elif v == p:
-        return float("0."+str(value))        
-    else:
-        if v == 2:
-            return float("0.0"+str(value))   
-        elif v == 1:
-            return float("0.00"+str(value))        
