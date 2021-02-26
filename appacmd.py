@@ -123,7 +123,7 @@ class RepeatedTimer(object):
 
 data_appa = DataAppa(0, None, None, None, None, None, None, None, None)
 # print(data_appa.range_code)
-data_appa.range_code = "1000V"
+# data_appa.range_code = "1000V"
 # print(data_appa.range_code)
 
 
