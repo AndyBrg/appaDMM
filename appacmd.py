@@ -64,7 +64,7 @@ from appa_109n import *
 
 class DataAppa:
     def __init__(self, index_count, time_receive, rotor_code, blue_code, range_code, main_read, sub_read, main_pointcode, func_table):
-         self.index_count = index_count
+        self.index_count = index_count
         self.time_receive = time_receive
         self.rotor_code = rotor_code
         self.blue_code = blue_code
@@ -122,9 +122,10 @@ class RepeatedTimer(object):
 
 
 data_appa = DataAppa(0, None, None, None, None, None, None, None, None)
-print(data_appa.range_code)
+# print(data_appa.range_code)
 data_appa.range_code = "1000V"
-print(data_appa.range_code)
+# print(data_appa.range_code)
+
 
 poll_time = 0.5
 
