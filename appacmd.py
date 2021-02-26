@@ -62,6 +62,21 @@ from appa_109n import *
 #                 ("sub_read4", c_ubyte),
 #                 ("check_sum", c_ubyte)]
 
+class DataAppa:
+    def __init__(self, index_count, time_receive, rotor_code, blue_code, range_code, main_read, sub_read, main_pointcode, func_table):
+         self.index_count = index_count
+        self.time_receive = time_receive
+        self.rotor_code = rotor_code
+        self.blue_code = blue_code
+        self.range_code = range_code
+        self.main_read = main_read
+        self.sub_read = sub_read
+        self.main_pointcode = main_pointcode
+        self.func_table = func_table
+
+
+
+
 def value_to_float(value: int, point_code: int) -> float:
     v = len(str(value))
     p = point_code
@@ -106,10 +121,15 @@ class RepeatedTimer(object):
         self.is_running = False
 
 
+data_appa = DataAppa(0, None, None, None, None, None, None, None, None)
+print(data_appa.range_code)
+data_appa.range_code = "1000V"
+print(data_appa.range_code)
+
 poll_time = 0.5
 
 
-get_counts = 0
+ind_counts = 0
 
 main_rotor_code =0
 main_blue_code=0
@@ -123,12 +143,12 @@ global data_receive
 
 
 def send_port():
-    global get_counts
+    global ind_counts
 
     global main_rotor_code, main_blue_code, main_range_code
     global main_value_b, main_value
    
-    if get_counts == 0:
+    if ind_counts == 0:
         ser.write(data_send)
         time.sleep(0.5)
     data_receive = ser.readline()
@@ -141,7 +161,7 @@ def send_port():
             
     if check_crc(data_receive):
         crc = "OK"
-        get_counts += 1
+        ind_counts += 1
 
         main_rotor_code = rotorcode(tmp[4:5])
 
@@ -172,8 +192,8 @@ def send_port():
         crc ="ER"
 
     
-    # print(get_counts, time_receive, crc, data_receive)
-    print(get_counts, time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
+    # print(ind_counts, time_receive, crc, data_receive)
+    print(ind_counts, time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
     ser.write(data_send)
 
 
