@@ -139,16 +139,13 @@ def send_port():
         crc = "OK"
         get_counts += 1
 
-        main_rotor_code = rotorcode(int_to_bytes(data_receive[4]))
+        main_rotor_code = rotorcode(tmp[4:5])
 
-        main_blue_code  = bluecode(int_to_bytes(data_receive[4]) + 
-                                int_to_bytes(data_receive[5]))
+        main_blue_code  = bluecode(tmp[4:5] + tmp[5:6])
 
-        main_range_code = rangecode(int_to_bytes(data_receive[4]) + 
-                                    int_to_bytes(data_receive[5]) + 
-                                    int_to_bytes(data_receive[7]))  
+        main_range_code = rangecode(tmp[4:5] + tmp[5:6] + tmp[7:8])  
 
-        main_value_b = int_to_bytes(data_receive[8]) + int_to_bytes(data_receive[9]) + int_to_bytes(data_receive[10])
+        main_value_b = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
 
         main_value = int.from_bytes(main_value_b, byteorder = "little")     
 
@@ -160,14 +157,14 @@ def send_port():
 
         main_unit_code_bits = main_status_bits[0:5]
 
-        func_table = functiontable(int_to_bytes(data_receive[12]))
+        func_table = functiontable(tmp[12:13])
 
             
     else:
         crc ="ER"
 
     
-    print(get_counts, time_receive, crc, data_receive)
+    # print(get_counts, time_receive, crc, data_receive)
     print(get_counts, time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
     ser.write(data_send)
 
