@@ -72,14 +72,14 @@ def value_to_float(value: int, point_code: int) -> float:
     elif v == p:
         return float("0."+str(value))        
     else:
-        if v == 2 or (p-v == 1):
+        if v == 2 or (p-v) == 1:
             return float("0.0"+str(value))   
-        elif v == 1 or (p-v == 2):
+        elif v == 1 or (p-v) == 2:
             return float("0.00"+str(value))    
-        elif p-v == 3:
-            return float("0.000"+str(value))  
-            
-                 
+        elif (p-v) == 3:
+            return float("0.000"+str(value)) 
+
+
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
         self._timer     = None
