@@ -72,10 +72,14 @@ def value_to_float(value: int, point_code: int) -> float:
     elif v == p:
         return float("0."+str(value))        
     else:
-        if v == 2:
+        if v == 2 or (p-v == 1):
             return float("0.0"+str(value))   
-        elif v == 1:
-            return float("0.00"+str(value))      
+        elif v == 1 or (p-v == 2):
+            return float("0.00"+str(value))    
+        elif p-v == 3:
+            return float("0.000"+str(value))  
+            
+                 
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
         self._timer     = None
@@ -145,9 +149,13 @@ def send_port():
 
         main_range_code = rangecode(tmp[4:5] + tmp[5:6] + tmp[7:8])  
 
-        main_value_b = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
+        # main_value_b = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
 
-        main_value = int.from_bytes(main_value_b, byteorder = "little")     
+        # main_value = int.from_bytes(main_value_b, byteorder = "little")     
+        main_value = int.from_bytes(tmp[8:9]  + 
+                                    tmp[9:10] + 
+                                    tmp[10:11], 
+                                    byteorder = "little")
 
         main_status_bits = bin(data_receive[11])[2:].zfill(8)
 
