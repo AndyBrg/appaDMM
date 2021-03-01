@@ -149,7 +149,7 @@ def send_port():
     global main_rotor_code, main_blue_code, main_range_code
     global main_value_b, main_value
    
-    if ind_counts == 0:
+    if data_appa.index_count == 0:
         ser.write(data_send)
         time.sleep(0.5)
     data_receive = ser.readline()
@@ -162,7 +162,7 @@ def send_port():
             
     if check_crc(data_receive):
         crc = "OK"
-        ind_counts += 1
+        data_appa.index_count += 1
 
         main_rotor_code = rotorcode(data_receive[4:5])
 
@@ -194,7 +194,8 @@ def send_port():
 
     
     # print(ind_counts, time_receive, crc, data_receive)
-    print(ind_counts, time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
+    print(data_appa.index_count, 
+          time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
     ser.write(data_send)
 
 
