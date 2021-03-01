@@ -164,18 +164,18 @@ def send_port():
         crc = "OK"
         ind_counts += 1
 
-        main_rotor_code = rotorcode(tmp[4:5])
+        main_rotor_code = rotorcode(data_receive[4:5])
 
-        main_blue_code  = bluecode(tmp[4:5] + tmp[5:6])
+        main_blue_code  = bluecode(data_receive[4:5] + data_receive[5:6])
 
-        main_range_code = rangecode(tmp[4:5] + tmp[5:6] + tmp[7:8])  
+        main_range_code = rangecode(data_receive[4:5] + data_receive[5:6] + data_receive[7:8])  
 
         # main_value_b = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
 
         # main_value = int.from_bytes(main_value_b, byteorder = "little")     
-        main_value = int.from_bytes(tmp[8:9]  + 
-                                    tmp[9:10] + 
-                                    tmp[10:11], 
+        main_value = int.from_bytes(data_receive[8:9]  + 
+                                    data_receive[9:10] + 
+                                    data_receive[10:11], 
                                     byteorder = "little")
 
         main_status_bits = bin(data_receive[11])[2:].zfill(8)
@@ -186,7 +186,7 @@ def send_port():
 
         main_unit_code_bits = main_status_bits[0:5]
 
-        func_table = functiontable(tmp[12:13])
+        func_table = functiontable(data_receive[12:13])
 
             
     else:
