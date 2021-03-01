@@ -130,7 +130,7 @@ data_appa = DataAppa(0, None, None, None, None, None, None, None, None)
 poll_time = 0.5
 
 
-ind_counts = 0
+# ind_counts = 0
 
 main_rotor_code =0
 main_blue_code=0
@@ -144,7 +144,7 @@ global data_receive
 
 
 def send_port():
-    global ind_counts
+    # global ind_counts
 
     global main_rotor_code, main_blue_code, main_range_code
     global main_value_b, main_value
@@ -193,9 +193,12 @@ def send_port():
         crc ="ER"
 
     
-    # print(ind_counts, time_receive, crc, data_receive)
     print(data_appa.index_count, 
-          time_receive, value_to_float(main_value, main_pointcode), unitcode(main_unit_code_bits))
+          time_receive, 
+          value_to_float(main_value, 
+          main_pointcode), 
+          unitcode(main_unit_code_bits))
+
     ser.write(data_send)
 
 
