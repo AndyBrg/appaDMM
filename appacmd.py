@@ -63,7 +63,17 @@ from appa_109n import *
 #                 ("check_sum", c_ubyte)]
 
 class DataAppa:
-    def __init__(self, index_count, time_receive, rotor_code, blue_code, range_code, main_read, sub_read, main_pointcode, func_table):
+    def __init__(self, 
+        index_count, 
+        time_receive, 
+        rotor_code, 
+        blue_code, 
+        range_code, 
+        main_read, 
+        sub_read, 
+        main_pointcode, 
+        func_table, 
+        unitcode):
         self.index_count = index_count
         self.time_receive = time_receive
         self.rotor_code = rotor_code
@@ -73,6 +83,7 @@ class DataAppa:
         self.sub_read = sub_read
         self.main_pointcode = main_pointcode
         self.func_table = func_table
+        self.unitcode = unitcode
 
 
 
@@ -121,7 +132,7 @@ class RepeatedTimer(object):
         self.is_running = False
 
 
-data_appa = DataAppa(0, None, None, None, None, None, None, None, None)
+data_appa = DataAppa(0, None, None, None, None, None, None, None, None, None)
 # print(data_appa.range_code)
 # data_appa.range_code = "1000V"
 # print(data_appa.range_code)
@@ -132,11 +143,11 @@ poll_time = 0.5
 
 # ind_counts = 0
 
-main_rotor_code =0
-main_blue_code=0
-main_range_code = 0
-main_value_b=0
-main_value = 0
+# main_rotor_code =0
+# main_blue_code=0
+# main_range_code = 0
+# main_value_b=0
+# main_value = 0
 
 global time_receive
 global data_receive
@@ -154,50 +165,59 @@ def send_port():
         time.sleep(0.5)
     data_receive = ser.readline()
    
-    time_receive = datetime.isoformat(
+    data_appa.time_receive = datetime.isoformat(
         datetime.now(), sep=' ', timespec='milliseconds')    
 
-    # appa_type = data_receive[0:4] # Получаем тип мультиметра
-    # if appa_type.hex() == "5555000e": # Для APPA 109N
+ 
             
     if check_crc(data_receive):
         crc = "OK"
-        data_appa.index_count += 1
 
-        main_rotor_code = rotorcode(data_receive[4:5])
+        appa_type = data_receive[0:4] # Получаем тип мультиметра
+        if appa_type.hex() == "5555000e": # Для APPA 109N
+            # main_status_bits = 0
+            # point_code_bits = 0
+            data_appa.index_count += 1
 
-        main_blue_code  = bluecode(data_receive[4:5] + data_receive[5:6])
+            data_appa.rotor_code = rotorcode(data_receive[4:5])
 
-        main_range_code = rangecode(data_receive[4:5] + data_receive[5:6] + data_receive[7:8])  
+            data_appa.blue_code  = bluecode(data_receive[4:5] + data_receive[5:6])
 
-        # main_value_b = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
+            data_appa.range_code = rangecode(data_receive[4:5] + data_receive[5:6] + data_receive[7:8])  
 
-        # main_value = int.from_bytes(main_value_b, byteorder = "little")     
-        main_value = int.from_bytes(data_receive[8:9]  + 
-                                    data_receive[9:10] + 
-                                    data_receive[10:11], 
-                                    byteorder = "little")
+            # main_value_b = int_to_bytes((tmp[8]<<16) | (tmp[9]<<8) | tmp[10])
 
-        main_status_bits = bin(data_receive[11])[2:].zfill(8)
+            # main_value = int.from_bytes(main_value_b, byteorder = "little")     
+            data_appa.main_read = int.from_bytes(
+                data_receive[8:9]  + 
+                data_receive[9:10] + 
+                data_receive[10:11], 
+                byteorder = "little")
 
-        point_code_bits = main_status_bits[5:]    
+            main_status_bits = bin(data_receive[11])[2:].zfill(8)
 
-        main_pointcode = pointcode(point_code_bits)
+            point_code_bits = main_status_bits[5:]    
 
-        main_unit_code_bits = main_status_bits[0:5]
+            data_appa.main_pointcode = pointcode(point_code_bits)
 
-        func_table = functiontable(data_receive[12:13])
+            main_unit_code_bits = main_status_bits[0:5]
 
+            func_table = functiontable(data_receive[12:13])
+
+            print(
+                data_appa.index_count, 
+                data_appa.time_receive, 
+                value_to_float(data_appa.main_read, data_appa.main_pointcode), 
+                data_appa.unitcode)
+        else:
+            print("Unidentified DMM")
             
     else:
         crc ="ER"
+        print("CRC Error")
 
     
-    print(data_appa.index_count, 
-          time_receive, 
-          value_to_float(main_value, 
-          main_pointcode), 
-          unitcode(main_unit_code_bits))
+
 
     ser.write(data_send)
 
