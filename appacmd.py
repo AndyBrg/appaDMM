@@ -194,21 +194,10 @@ def send_port():
                 data_receive[10:11], 
                 byteorder = "little")
 
-            main_status_bits = bin(data_receive[11])[2:].zfill(8)
-            point_code_bits = main_status_bits[5:]    
-            data_appa.main_pointcode = pointcode(point_code_bits)
-            
-            print(data_appa.main_pointcode)
-            print(pointcode(bin(data_receive[11])[2:].zfill(8)[5:]))
-            if data_appa.main_pointcode == pointcode(bin(data_receive[11])[2:].zfill(8)[5:]):
-                print("main_pointcode = OK")
-            else:
-                print("main_pointcode = BAD")    
-
-            #   data_appa.main_pointcode =  pointcode(bin(data_receive[11])[2:].zfill(8)[5:])
-
-
-            main_unit_code_bits = main_status_bits[0:5]
+           
+            data_appa.main_pointcode = pointcode(bin(data_receive[11])[2:].zfill(8)[5:])
+            data_appa.unitcode = unitcode(bin(data_receive[11])[2:].zfill(8)[0:5])            
+           
 
             func_table = functiontable(data_receive[12:13])
 
@@ -216,6 +205,7 @@ def send_port():
                 data_appa.index_count, 
                 data_appa.time_receive, 
                 value_to_float(data_appa.main_read, data_appa.main_pointcode), 
+                data_appa.main_pointcode,
                 data_appa.unitcode)
         else:
             print("Unidentified DMM")
