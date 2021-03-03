@@ -197,6 +197,7 @@ def send_port():
             main_status_bits = bin(data_receive[11])[2:].zfill(8)
             point_code_bits = main_status_bits[5:]    
             data_appa.main_pointcode = pointcode(point_code_bits)
+            
             print(data_appa.main_pointcode)
             print(pointcode(bin(data_receive[11])[2:].zfill(8)[5:]))
             if data_appa.main_pointcode == pointcode(bin(data_receive[11])[2:].zfill(8)[5:]):
